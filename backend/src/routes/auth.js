@@ -10,6 +10,7 @@ const router = express.Router();
 router.post("/register", async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    // Role is not accepted from signup — defaults to "viewer" via the model
     const user = new User({ email, password });
     await user.save();
     res.status(201).json({ message: "User created successfully" });
