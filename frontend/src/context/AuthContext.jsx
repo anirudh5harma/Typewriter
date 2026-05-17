@@ -1,4 +1,5 @@
 import { useState, createContext, useContext, useCallback, useEffect } from 'react';
+import { authApi } from '../lib/api';
 
 const AuthContext = createContext(null);
 
@@ -17,13 +18,7 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Login failed');
+      const data = await authApi.login(email, password);
       localStorage.setItem('tw_token', data.token);
       localStorage.setItem('tw_user', JSON.stringify(data.user));
       setToken(data.token);
@@ -37,14 +32,7 @@ export function AuthProvider({ children }) {
   const register = useCallback(async (email, password) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-      return data;
+      return await authApi.register(email, password);
     } finally {
       setLoading(false);
     }
@@ -61,18 +49,11 @@ export function AuthProvider({ children }) {
     const checkAuth = async () => {
       if (!token) return;
       try {
-        const res = await fetch('/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-          localStorage.setItem('tw_user', JSON.stringify(data));
-        } else {
-          logout();
-        }
+        const data = await authApi.me();
+        setUser(data);
+        localStorage.setItem('tw_user', JSON.stringify(data));
       } catch {
-        // silently fail
+        logout();
       }
     };
     checkAuth();

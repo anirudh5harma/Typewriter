@@ -1,8 +1,23 @@
-const API_BASE = '';
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
+function buildUrl(path) {
+  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+async function parseResponse(res) {
+  const text = await res.text();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Expected JSON from API but received ${res.status} ${res.statusText}`);
+  }
+}
 
 async function api(path, options = {}) {
   const token = localStorage.getItem('tw_token');
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(buildUrl(path), {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -10,7 +25,7 @@ async function api(path, options = {}) {
       ...options.headers,
     },
   });
-  const data = await res.json().catch(() => null);
+  const data = await parseResponse(res);
   if (!res.ok) throw new Error(data?.message || `Request failed: ${res.status}`);
   return data;
 }
