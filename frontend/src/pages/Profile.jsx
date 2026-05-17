@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
-  User, Mail, Shield, Calendar, Edit3, Check, AlertCircle,
-  Save, LogOut
+  Mail, Shield, Calendar, Edit3, Check, AlertCircle, Save, LogOut, X
 } from 'lucide-react';
 
 export default function Profile() {
@@ -13,121 +12,121 @@ export default function Profile() {
   const [error, setError] = useState('');
 
   const handleSave = async () => {
-    setError('');
-    setSaved(false);
-    // In a real app, this would call an API
-    setTimeout(() => {
-      setSaved(true);
-      setEditing(false);
-    }, 600);
+    setError(''); setSaved(false);
+    setTimeout(() => { setSaved(true); setEditing(false); }, 500);
   };
 
-  const roleColors = {
-    admin: 'bg-terracotta-100 text-terracotta-700 border-terracotta-200',
-    editor: 'bg-sage-100 text-sage-700 border-sage-200',
-    viewer: 'bg-ink-100 text-ink-600 border-ink-200',
-  };
+  const initial = (user?.email || 'U')[0].toUpperCase();
+  const memberSince = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-serif font-bold mb-8">Profile</h1>
+    <div className="min-h-screen pt-24 pb-20 px-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-12">
+          <div className="eyebrow mb-3">— Account</div>
+          <h1 className="font-serif text-5xl md:text-6xl tracking-display text-ink-900 leading-[1]">
+            Your <span className="font-serif-i">profile</span>
+          </h1>
+        </div>
 
-        <div className="space-y-6">
-          {/* Profile Card */}
-          <div className="bg-white rounded-2xl border border-parchment-300 shadow-sm p-8">
-            <div className="flex items-start gap-6">
-              <div className="w-20 h-20 rounded-2xl bg-terracotta-500 flex items-center justify-center text-white text-2xl font-serif font-bold shadow-md flex-shrink-0">
-                {(user?.email || 'U')[0].toUpperCase()}
+        {/* Identity card */}
+        <div className="surface p-8 mb-6">
+          <div className="flex items-start gap-6">
+            <div className="w-20 h-20 rounded-2xl bg-ink-900 flex items-center justify-center text-paper text-4xl font-serif-i flex-shrink-0">
+              {initial}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap mb-2">
+                <h2 className="font-serif text-3xl text-ink-900 truncate leading-tight">{user?.email || 'User'}</h2>
+                <span className="pill">{user?.role || 'viewer'}</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1">
-                  <h2 className="font-serif text-2xl font-semibold truncate">{user?.email || 'User'}</h2>
-                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border capitalize ${roleColors[user?.role] || roleColors.viewer}`}>
-                    {user?.role || 'viewer'}
-                  </span>
-                </div>
-                <p className="text-ink-400 text-sm flex items-center gap-1.5 mb-4">
-                  <Calendar size={14} />
-                  Member since {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </p>
-
-                {editing ? (
-                  <div className="space-y-3">
-                    {error && (
-                      <div className="flex items-center gap-2 p-3 rounded-lg bg-terracotta-50 border border-terracotta-200 text-terracotta-700 text-sm">
-                        <AlertCircle size={16} /> {error}
-                      </div>
-                    )}
-                    {saved && (
-                      <div className="flex items-center gap-2 p-3 rounded-lg bg-sage-50 border border-sage-200 text-sage-700 text-sm">
-                        <Check size={16} /> Profile updated
-                      </div>
-                    )}
-                    <div>
-                      <label className="block text-sm font-medium text-ink-700 mb-1.5">Email</label>
-                      <div className="relative">
-                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={e => setEmail(e.target.value)}
-                          className="input-field pl-10"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-2 pt-1">
-                      <button onClick={handleSave} className="btn-primary">
-                        <Save size={16} className="mr-1.5" />
-                        Save
-                      </button>
-                      <button onClick={() => { setEditing(false); setEmail(user?.email || ''); }} className="btn-secondary">
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-sm">
-                      <Mail size={16} className="text-ink-300" />
-                      <span className="text-ink-600">{user?.email}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <Shield size={16} className="text-ink-300" />
-                      <span className="text-ink-600 capitalize">{user?.role || 'viewer'} access</span>
-                    </div>
-                    <button
-                      onClick={() => setEditing(true)}
-                      className="btn-secondary mt-2 text-sm"
-                    >
-                      <Edit3 size={14} className="mr-1.5" />
-                      Edit Profile
-                    </button>
-                  </div>
-                )}
+              <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-400 nums">
+                member since {memberSince}
               </div>
             </div>
-          </div>
-
-          {/* Danger Zone */}
-          <div className="bg-white rounded-2xl border border-parchment-300 shadow-sm p-8">
-            <h3 className="font-serif text-lg font-semibold text-terracotta-700 mb-4">Danger Zone</h3>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-ink-700">Sign out everywhere</p>
-                <p className="text-xs text-ink-400 mt-0.5">This will end your current session.</p>
-              </div>
-              <button
-                onClick={logout}
-                className="btn-secondary border-terracotta-200 text-terracotta-600 hover:bg-terracotta-50 hover:text-terracotta-700"
-              >
-                <LogOut size={14} className="mr-1.5" />
-                Sign Out
+            {!editing && (
+              <button onClick={() => setEditing(true)} className="btn-secondary text-sm">
+                <Edit3 size={14} /> Edit
               </button>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Details */}
+        <div className="surface divide-y divide-[var(--hair)]">
+          {editing ? (
+            <div className="p-7">
+              {error && (
+                <div className="mb-4 flex items-center gap-2 p-3 rounded-xl bg-accent-50 border border-accent-200 text-accent-700 text-sm">
+                  <AlertCircle size={16} /> {error}
+                </div>
+              )}
+              {saved && (
+                <div className="mb-4 flex items-center gap-2 p-3 rounded-xl bg-ink-50 border border-[var(--hair)] text-ink-700 text-sm">
+                  <Check size={16} className="text-accent-600" /> Profile updated
+                </div>
+              )}
+              <label className="label block mb-1.5">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="input mb-5"
+              />
+              <div className="flex justify-end gap-2">
+                <button onClick={() => { setEditing(false); setEmail(user?.email || ''); }} className="btn-secondary">
+                  <X size={14} /> Cancel
+                </button>
+                <button onClick={handleSave} className="btn-accent">
+                  <Save size={14} /> Save changes
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Row
+                label="Email"
+                value={user?.email || '—'}
+                icon={<Mail size={14} className="text-ink-400" strokeWidth={1.6} />}
+              />
+              <Row
+                label="Role"
+                value={user?.role || 'viewer'}
+                icon={<Shield size={14} className="text-ink-400" strokeWidth={1.6} />}
+              />
+              <Row
+                label="Joined"
+                value={memberSince}
+                icon={<Calendar size={14} className="text-ink-400" strokeWidth={1.6} />}
+              />
+            </>
+          )}
+        </div>
+
+        {/* Sign out */}
+        <div className="mt-10 surface p-7 flex items-center justify-between gap-4">
+          <div>
+            <div className="eyebrow mb-1">Session</div>
+            <p className="font-serif text-xl text-ink-900 leading-tight">Sign out of Typewriter</p>
+            <p className="text-ink-500 text-sm mt-1">End this session on this device.</p>
+          </div>
+          <button onClick={logout} className="btn-secondary border-accent-200 text-accent-700 hover:border-accent-500">
+            <LogOut size={14} /> Sign out
+          </button>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function Row({ label, value, icon }) {
+  return (
+    <div className="grid grid-cols-[140px_1fr] items-center gap-6 px-7 py-5">
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className="eyebrow">{label}</span>
+      </div>
+      <span className="text-ink-900 text-[15px] truncate capitalize">{value}</span>
     </div>
   );
 }

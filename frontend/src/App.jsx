@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -11,7 +11,7 @@ import Profile from './pages/Profile';
 
 function AppLayout({ children, hideFooter = false }) {
   return (
-    <div className="min-h-screen flex flex-col bg-parchment-50">
+    <div className="min-h-screen flex flex-col bg-paper text-ink-900">
       <Navbar />
       <main className="flex-1">{children}</main>
       {!hideFooter && <Footer />}
@@ -20,9 +20,6 @@ function AppLayout({ children, hideFooter = false }) {
 }
 
 function App() {
-  const location = useLocation();
-  const isEditor = location.pathname.startsWith('/editor');
-
   return (
     <Routes>
       <Route
@@ -33,22 +30,10 @@ function App() {
           </AppLayout>
         }
       />
-      <Route
-        path="/login"
-        element={
-          <AppLayout hideFooter>
-            <Login />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <AppLayout hideFooter>
-            <Register />
-          </AppLayout>
-        }
-      />
+      {/* Auth pages own their full-bleed split layout */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
       <Route
         path="/dashboard"
         element={
